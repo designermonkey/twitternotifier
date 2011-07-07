@@ -45,11 +45,11 @@ class Extension_TwitterNotifier extends Extension
 				`oauth_token` text,
 				`oauth_token_secret` text,
 				`authorised` enum('yes','no') DEFAULT 'no',
-				`sections` int(10) unsigned NOT NULL,
+				`section` int(10) unsigned NOT NULL,
+				`field` int(10) unsigned NOT NULL,
 				`author` int(10) unsigned NOT NULL,
 				`url` varchar(250) NOT NULL,
-				`date_last_sent` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-				`path` varchar(250) NOT NULL,
+				`expression` varchar(250) NOT NULL,
 				`status` varchar(250) NOT NULL,
 				PRIMARY KEY (`id`)
 			) ENGINE=MyISAM;
