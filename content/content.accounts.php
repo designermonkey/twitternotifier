@@ -8,6 +8,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 	protected $_driver = null;
 	protected $_uri = null;
 	protected $_account = null;
+	protected $_accounts = null;
 
 	protected $_pagination = null;
 	protected $_table_column = null;
@@ -32,7 +33,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 					$this->__prepareNew();
 				break;
 				case 'edit':
-					$this->__prepareEdit($context[1]);
+					$this->__prepareEdit($context);
 				break;
 			}
 		}
@@ -42,13 +43,19 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 	public function __prepareNew()
 	{
 		$this->_uri .= "/connect/account/";
+
+		$this->_accounts = Symphony::Database()->fetch("
+			SELECT * FROM `".$this->_driver->table."`
+		", 'id');
+
+		var_dump($this->_accounts);
 	}
 
-	public function __prepareEdit($account_id)
+	public function __prepareEdit($context)
 	{
-		$this->_uri .= "/connect/account/" . $account_id . "/";
+		$this->_uri .= "/connect/account/" . $context[1] . "/";
 		$this->_account = Symphony::Database()->fetch("
-			SELECT * FROM `" . $this->_driver->table . "` WHERE `id` = '" . $account_id . "'
+			SELECT * FROM `" . $this->_driver->table . "` WHERE `id` = '" . $context[1] . "'
 		");
 	}
 
@@ -103,17 +110,32 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$fieldset->setAttribute('class', 'settings');
 		$fieldset->appendChild(new XMLElement('legend', __('Step 2: Choose Notification Details')));
 
+		$div = new XMLElement('div');
+		$div->setAttribute('class', 'group');
+
 		$label = Widget::Label(__('Notifying Section'));
-
 		$SectionManager = new SectionManager($this->_Parent);
-
 		$options = array();
 		foreach($SectionManager->fetch(NULL, 'ASC', 'sortorder') as $section)
 		{
 			$options[] = array($section->get('id'), ($fields['section'] == $section->get('id')), $section->get('name'));
 		}
-
 		$label->appendChild(Widget::Select('fields[section]', $options, array('id' => 'section')));
+		$div->appendChild($label);
+
+		$label = Widget::Label(__('Parameter Value'));
+		$FieldManager = new FieldManager($this->_Parent);
+		$options = array();
+		foreach($FieldManager->fetch(NULL, NULL, 'ASC', 'sortorder') as $field)
+		{
+			$options[] = array($field->get('id'), ($fields['field'] == $field->get('id')), $field->get('label'), 'section-id-'.$field->get('parent_section'));
+		}
+		$label->appendChild(Widget::Select('fields[field]', $options, array('id' => 'fields')));
+		$div->appendChild($label);
+
+		$fieldset->appendChild($div);
+
+		$this->Form->appendChild($fieldset);
 
 
 	}
