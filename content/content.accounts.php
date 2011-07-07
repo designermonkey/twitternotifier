@@ -173,9 +173,8 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 			SELECT
 				id,
 				screen_name,
-				sections,
+				section,
 				author,
-				date_last_sent,
 				status
 			FROM tbl_authors_twitter_accounts
 		");
