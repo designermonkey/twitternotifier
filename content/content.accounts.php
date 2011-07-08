@@ -99,7 +99,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$div->appendChild($label);
 
 		$label = Widget::Label(__('Twitter User ID'));
-		$label->appendChild(Widget::Input('fields[uesr_id]', $this->_account['user_id'], 'text', array('readonly' => 'readonly')));
+		$label->appendChild(Widget::Input('fields[user_id]', $this->_account['user_id'], 'text', array('readonly' => 'readonly')));
 		$div->appendChild($label);
 
 		$fieldset->appendChild($div);
@@ -118,7 +118,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$options = array();
 		foreach($SectionManager->fetch(NULL, 'ASC', 'sortorder') as $section)
 		{
-			$options[] = array($section->get('id'), ($fields['section'] == $section->get('id')), $section->get('name'));
+			$options[] = array($section->get('id'), ($this->_account['section'] == $section->get('id')), $section->get('name'));
 		}
 		$label->appendChild(Widget::Select('fields[section]', $options, array('id' => 'section')));
 		$div->appendChild($label);
@@ -128,7 +128,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$options = array();
 		foreach($FieldManager->fetch(NULL, NULL, 'ASC', 'sortorder') as $field)
 		{
-			$options[] = array($field->get('id'), ($fields['field'] == $field->get('id')), $field->get('label'), 'section-id-'.$field->get('parent_section'));
+			$options[] = array($field->get('id'), ($this->_account['field'] == $field->get('id')), $field->get('label'), 'section-id-'.$field->get('parent_section'));
 		}
 		$label->appendChild(Widget::Select('fields[field]', $options, array('id' => 'fields')));
 		$div->appendChild($label);
@@ -137,8 +137,19 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 
 		$this->Form->appendChild($fieldset);
 
+		$div = new XMLElement('div');
+		$div->setAttribute('class', 'actions');
+		$div->appendChild(Widget::Input('action[save]', ($this->_context[0] == 'edit' ? __('Save Changes') : __('Create Account')), 'submit', array('accesskey' => 's')));
 
+		if($this->_context[0] == 'edit'){
+			$button = new XMLElement('button', __('Delete'));
+			$button->setAttributeArray(array('name' => 'action[delete]', 'class' => 'button confirm delete', 'title' => __('Delete this account'), 'type' => 'submit', 'accesskey' => 'd', 'data-message' => __('Are you sure you want to delete this account?')));
+			$div->appendChild($button);
+		}
+
+		$this->Form->appendChild($div);
 	}
+	
 	public function __viewIndex()
 	{
 		// List the table columns
@@ -454,6 +465,26 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 						");
 					}
 			}
+		}
+	}
+	
+	public function __actionEdit()
+	{
+		if(array_key_exists('save', $_POST['action'])){
+		
+			$author = Symphony::Engine()->Author->get('id');
+			
+			Symphony::Database()->query("
+				UPDATE
+					`tbl_authors_twitter_accounts`
+				SET
+					`author` = {$author},
+					`section` = {$_POST['fields']['section']},
+					`field` = {$_POST['fields']['field']},
+					`status` = 'Active'
+				WHERE
+					`id` = {$this->_account['id']}
+			");
 		}
 	}
 
