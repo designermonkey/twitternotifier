@@ -48,13 +48,13 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 			SELECT * FROM `".$this->_driver->table."`
 		", 'id');
 
-		var_dump($this->_accounts);
+		// var_dump($this->_accounts); TODO remove
 	}
 
 	public function __prepareEdit($context)
 	{
 		$this->_uri .= "/connect/account/" . $context[1] . "/";
-		$this->_account = Symphony::Database()->fetch("
+		$this->_account = Symphony::Database()->fetchRow(0, "
 			SELECT * FROM `" . $this->_driver->table . "` WHERE `id` = '" . $context[1] . "'
 		");
 	}
@@ -95,11 +95,11 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$div->setAttribute('class', 'group');
 
 		$label = Widget::Label(__('Screen Name'));
-		$label->appendChild(Widget::Input('fields[screen_name]', $fields['screen_name'], 'text', array('readonly' => 'readonly')));
+		$label->appendChild(Widget::Input('fields[screen_name]', $this->_account['screen_name'], 'text', array('readonly' => 'readonly')));
 		$div->appendChild($label);
 
 		$label = Widget::Label(__('Twitter User ID'));
-		$label->appendChild(Widget::Input('fields[uesr_id]', $fields['user_id'], 'text', array('readonly' => 'readonly')));
+		$label->appendChild(Widget::Input('fields[uesr_id]', $this->_account['user_id'], 'text', array('readonly' => 'readonly')));
 		$div->appendChild($label);
 
 		$fieldset->appendChild($div);
