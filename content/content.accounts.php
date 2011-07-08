@@ -308,14 +308,8 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 					__SYM_DATETIME_FORMAT__, strtotime($account['date_last_sent'])
 				));
 
-
-				$account_sections = '';
-				$section_ids = (is_array($account['sections'])) ? explode(',',$account('sections')): array($account['sections']);
-				foreach($section_ids as $section_id)
-				{
-					$account_sections .= $sections[$section_id].', ';
-				}
-				$col_sections = Widget::TableData(trim($account_sections,", "));
+				// Column 4
+				$col_section = Widget::TableData($sections[$account['section']]);
 
 				$col_status = Widget::TableData($account['status']);
 
@@ -323,7 +317,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 					array(
 						$col_account,
 						$col_author,
-						$col_sections,
+						$col_section,
 						$col_date,
 						$col_status
 					),
