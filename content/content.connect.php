@@ -15,26 +15,26 @@ class contentExtensionTwitterNotifierConnect extends AdministrationPage
 	{
 		parent::__construct(&$parent);
 		$this->_driver = Symphony::ExtensionManager()->create('twitternotifier');
-		$this->_uri = URL . "/symphony/extension/twitternotifier/callback/account/";
+		$this->_uri = URL . "/symphony/extension/twitternotifier/callback/";
 	}
 
 	public function build($context)
 	{
 		if($context[1])
 		{
-			$this->__prepareAccount($context);
+			$this->__prepareIndex($context);
 		}
 		parent::build($context);
 	}
 
-	public function __prepareAccount($context)
+	public function __prepareIndex($context)
 	{
 		$this->_id = $context[1];
 		$this->_uri .= $this->_id . "/";
 		$this->_method = 'edit';
 	}
 
-	public function __viewAccount()
+	public function __viewIndex()
 	{
 		$this->TwitterOAuth = new TwitterOAuth(
 			$this->_driver->getConsumerKey(),

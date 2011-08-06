@@ -9,6 +9,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 	protected $_uri = null;
 	protected $_account = null;
 	protected $_accounts = null;
+	protected $_cookie = null;
 
 	protected $_pagination = null;
 	protected $_table_column = null;
@@ -42,7 +43,19 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 
 	public function __prepareNew()
 	{
-		$this->_uri .= "/connect/account/";
+		$this->_cookie = new Cookie(SYM_COOKIE_PREFIX . 'twitter_notifier', TWO_WEEKS, __SYM_COOKIE_PATH__);
+
+		if($this->_cookie->get('id'))
+		{
+			$id = $this->_cookie->get('id');
+			$this->_cookie->set('id', null);
+
+			header('Location: ' . $this->_uri . '/accounts/edit/' . $id . '/');
+		}
+		else
+		{
+			$this->_uri .= "/connect/";
+		}
 
 		$this->_accounts = Symphony::Database()->fetch("
 			SELECT * FROM `".$this->_driver->table."`
@@ -77,6 +90,8 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$fieldset->setAttribute('class', 'settings');
 		$fieldset->appendChild(new XMLElement('legend', __('Step 1: Sign in at Twitter')));
 
+		// Swap this button out if the account is available, and authorised.
+
 		$img = new XMLElement('input');
 		$img->setAttribute('type', 'image');
 		$img->setAttribute('src', URL . '/extensions/twitternotifier/assets/sign-in-with-twitter.png');
@@ -89,7 +104,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 
 		$fieldset->appendChild($label);
 
-		$this->Form->appendChild($fieldset);
+		// Get the cookie ID if it exists
 
 		$div = new XMLElement('div');
 		$div->setAttribute('class', 'group');
@@ -103,6 +118,8 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$div->appendChild($label);
 
 		$fieldset->appendChild($div);
+
+		$this->Form->appendChild($fieldset);
 
 	// Build Details Fieldset
 
@@ -149,7 +166,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 
 		$this->Form->appendChild($div);
 	}
-	
+
 	public function __viewIndex()
 	{
 		// List the table columns
@@ -461,13 +478,13 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 			}
 		}
 	}
-	
+
 	public function __actionEdit()
 	{
 		if(array_key_exists('save', $_POST['action'])){
-		
+
 			$author = Symphony::Engine()->Author->get('id');
-			
+
 			Symphony::Database()->query("
 				UPDATE
 					`tbl_authors_twitter_accounts`
