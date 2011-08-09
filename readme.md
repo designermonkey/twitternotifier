@@ -26,7 +26,9 @@ A new menu option is available under Preferences called 'Twitter Accounts' where
 
 3.	Choose the section, and it's field. The field chosen is where the value will be taken from that Twitter will link to.
 
-4.	Input the URL to link to. Use `$field` to represent the field you chose earlier.
+4.	Select the Page your entries will display under.
+
+5.	If you require any additional Url parameter values, use the text input field to add them. `$field` in this box represents the field you chose earlier, and is required for the notification process to target a specific article. To igonre specific entry targeting, don't add `$field`. All links will resolve to this url.
 
 ##Information
 

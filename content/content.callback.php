@@ -18,11 +18,11 @@ class contentExtensionTwitterNotifierCallback extends AdministrationPage
 
 	public function build($context)
 	{
-		$this->__prepareIndex($context);
+		$this->__prepareIndex();
 		parent::build($context);
 	}
 
-	public function __prepareIndex($context)
+	public function __prepareIndex()
 	{
 		$this->_account = Symphony::Database()->fetch("
 			SELECT * FROM `".$this->_driver->table."` WHERE `oauth_token` = '".$_GET['oauth_token']."' LIMIT 1
@@ -49,8 +49,6 @@ class contentExtensionTwitterNotifierCallback extends AdministrationPage
 		$fieldset = new XMLElement('fieldset');
 		$fieldset->setAttribute('class', 'settings');
 
-	//	var_dump($access_token);die;
-
 		if($this->TwitterOAuth->http_code == 200)
 		{
 			$this->_cookie = new Cookie(SYM_COOKIE_PREFIX . 'twitter_notifier', TWO_WEEKS, __SYM_COOKIE_PATH__);
@@ -62,34 +60,15 @@ class contentExtensionTwitterNotifierCallback extends AdministrationPage
 
 			$fieldset->appendChild(new XMLElement('legend', __('Authorization Complete')));
 			$label = Widget::Label(__('The Twitter authorization was successful.'));
-
-			$script = new XMLElement('script', "
-				(function($){
-					$(document).ready(function(){
-						$('#twitter_close').click(function(ev){
-							ev.preventDefault();
-							window.close();
-						});
-					});
-				})(jQuery);
-			");
 		}
 		else
 		{
+			Symphony::Database()->query("
+				DELETE FROM `" . $this->_driver->table . "` WHERE `id` = '" . $this->_account['id'] . "';
+			");
+
 			$fieldset->appendChild(new XMLElement('legend', __('Authorization Failed.')));
 			$label = Widget::Label(__('The Twitter authorization failed for some reason.'));
-
-			$script = new XMLElement('script', "
-				(function($){
-					$(document).ready(function(){
-						$('#twitter_close').click(function(ev){
-							ev.preventDefault();
-							console.log(window.opener);
-							//window.close();
-						});
-					});
-				})(jQuery);
-			");
 		}
 
 		$input = new XMLElement('a', __('Close Window'));
@@ -97,6 +76,17 @@ class contentExtensionTwitterNotifierCallback extends AdministrationPage
 		$input->setAttribute('id', 'twitter_close');
 
 		$label->appendChild($input);
+
+		$script = new XMLElement('script', "
+			(function($){
+				$(document).ready(function(){
+					$('#twitter_close').click(function(ev){
+						ev.preventDefault();
+						window.close();
+					});
+				});
+			})(jQuery);
+		");
 
 		$label->appendChild($script);
 		$fieldset->appendChild($label);
