@@ -4,6 +4,19 @@ Version: 2alpha
 Author: John Porter <john.porter@designermonkey.co.uk>
 Release Date: n/a
 
+##What doesn't work yet...
+
+The account management and Twitter authorisation is now complete and tested. There are already plans to update this as it is limited.
+
+A class for the Bitly API is needed, more API's are a feature to be added later.
+The notification function needs writing:
+
+1.	Build the URL from the data available and shorten it with available API class
+
+2.	Instantiate the TwitterOAuth class.
+
+3.	Send the notification.
+
 ##Installation
 
 Simply put, don't. It's not finished yet, but if you must:
@@ -33,3 +46,15 @@ A new menu option is available under Preferences called 'Twitter Accounts' where
 ##Information
 
 If you want more than one section to notify the same Twitter account, or more than one Author, you will need to input the Twitter account more than once. This problem will hopefully be addressed in the future once the extension's core has been tested and is bug free.
+
+##Planned Features
+
+1.	Multiple API classes for URL shortening, will all have a templated file to call the classes methods. User PHP knowledge is required to build new class. Shorteners will be selectable from the Preferences. [Difficult]
+
+2.	Multiple Authors from one account. Will allow for a global Twitter account to be created. Currently only allows one author per account, so having more authors means adding the account multiple times. [Easy]
+
+3.	Members integration. Create the Twitter Accounts menu item as a new main nav item with sub pages for Authors and Members. Allow account addition for registered members. This is just an idea, and use cases need thinking of to justify it. [Too Hard For Me!]
+
+4.	Event. To post on user comments or other frontend submission. Should this just be a filter? [Harder]
+
+5.	Logging of Twitter Notifications. All notifications logged. Integrate with Tracker, will ask Craig for help on this one [Need Help]
