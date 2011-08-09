@@ -47,9 +47,9 @@ class Extension_TwitterNotifier extends Extension
 				`authorised` enum('yes','no') DEFAULT 'no',
 				`section` int(10) unsigned NOT NULL,
 				`field` int(10) unsigned NOT NULL,
+				`page` int(10) NOT NULL,
+				`params` varchar(250) NOT NULL,
 				`author` int(10) unsigned NOT NULL,
-				`url` varchar(250) NOT NULL,
-				`expression` varchar(250) NOT NULL,
 				`status` varchar(250) NOT NULL,
 				PRIMARY KEY (`id`)
 			) ENGINE=MyISAM;
@@ -105,8 +105,9 @@ class Extension_TwitterNotifier extends Extension
 	{
 			$page = $context['parent']->Page;
 			if($page instanceof contentExtensionTwitterNotifierAccounts){
-				$page->addScriptToHead(URL . '/extensions/twitternotifier/assets/jquery.oauthpopup.js', null, false);
 				$page->addStylesheetToHead(URL . '/extensions/twitternotifier/assets/twitternotifier.css');
+				$page->addScriptToHead(URL . '/extensions/twitternotifier/assets/jquery.oauthpopup.js', null, false);
+				$page->addScriptToHead(URL . '/extensions/twitternotifier/assets/twitternotifier.js', null, false);
 			}
 	}
 
@@ -202,5 +203,4 @@ class Extension_TwitterNotifier extends Extension
 	{
 		return Symphony::Configuration()->get('consumer-secret', 'twitter-notifier');
 	}
-
 }
