@@ -48,8 +48,9 @@ If you want more than one section to notify the same Twitter account, or more th
 
 ##Planned Features
 
-3.	Members integration. Create the Twitter Accounts menu item as a new main nav item with sub pages for Authors and Members. Allow account addition for registered members. This is just an idea, and use cases need thinking of to justify it. [Too Hard For Me!]
+1.	Logging of Twitter Notifications. All notifications logged. Integrate with Tracker, will ask Craig for help on this one [Need Help]
+2.	Event. To post on user comments or other frontend submission. Should this just be a filter? [Hard]
 
-4.	Event. To post on user comments or other frontend submission. Should this just be a filter? [Harder]
+3.	Create Datasource. An action in the accounts index, and a button on the edit/saved page to create a datasource for the account, of the status feed. Will utilise the dynamic datasource functions of Symphony. [Hard]
 
-5.	Logging of Twitter Notifications. All notifications logged. Integrate with Tracker, will ask Craig for help on this one [Need Help]
+4.	Members integration. Create the Twitter Accounts menu item as a new main nav item with sub pages for Authors and Members. Allow account addition for registered members. This is just an idea, and use cases need thinking of to justify it. [Too Hard For Me!]
