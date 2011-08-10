@@ -13,7 +13,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 	protected $_mode = null;
 
 	protected $_pagination = null;
-	protected $_table_column = null;
+	protected $_table_column = 'screen_name';
 	protected $_table_columns = null;
 	protected $_table_direction = 'asc';
 
@@ -36,10 +36,14 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 					$this->__prepareNew($context);
 				break;
 				case 'edit':
-					$this->mode = 'edit';
+					$this->_mode = 'edit';
 					$this->__prepareEdit($context);
 				break;
 			}
+		}
+		else
+		{
+			$this->__prepareIndex();
 		}
 		parent::build($context);
 	}
@@ -148,8 +152,9 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$div = new XMLElement('div');
 		$div->setAttribute('class', 'group');
 
+	// Section
 		$label = Widget::Label(__('Notifying Section'));
-		$SectionManager = new SectionManager($this->_Parent);
+		$SectionManager = new SectionManager(Symphony::Engine());
 		$options = array();
 		foreach($SectionManager->fetch(NULL, 'ASC', 'sortorder') as $section)
 		{
@@ -158,18 +163,48 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$label->appendChild(Widget::Select('fields[section]', $options, array('id' => 'section')));
 		$div->appendChild($label);
 
-		$label = Widget::Label(__('Parameter Value'));
-		$FieldManager = new FieldManager($this->_Parent);
+	// Value Field
+		$label = Widget::Label(__('Field for parameter value)'));
+		$FieldManager = new FieldManager(Symphony::Engine());
 		$options = array();
 		foreach($FieldManager->fetch(NULL, NULL, 'ASC', 'sortorder') as $field)
 		{
-			$options[] = array($field->get('id'), ($this->_account['field'] == $field->get('id')), $field->get('label'), 'section-id-'.$field->get('parent_section'));
+			$options[] = array($field->get('id'), ($this->_account['field_param'] == $field->get('id')), $field->get('label'), 'section-id-'.$field->get('parent_section'));
 		}
-		$label->appendChild(Widget::Select('fields[field]', $options, array('id' => 'fields')));
+		$label->appendChild(Widget::Select('fields[field_param]', $options, array('id' => 'field_param')));
 		$div->appendChild($label);
 
 		$fieldset->appendChild($div);
 		$fieldset->appendChild(new XMLElement('p', __('Choose the section to notify this account about, and it\'s field to use as the URL value.'), array('class' => 'help')));
+
+		$div = new XMLElement('div');
+		$div->setAttribute('class', 'group');
+
+	// Message Field
+		$label = Widget::Label(__('Field for message (will be excerpted)'));
+		$FieldManager2 = new FieldManager(Symphony::Engine());
+		$options = array();
+		foreach($FieldManager2->fetch(NULL, NULL, 'ASC', 'sortorder') as $field2)
+		{
+			$options[] = array($field2->get('id'), ($this->_account['field_msg'] == $field2->get('id')), $field2->get('label'), 'section-id-'.$field2->get('parent_section'));
+		}
+		$label->appendChild(Widget::Select('fields[field_msg]', $options, array('id' => 'field_msg')));
+		$div->appendChild($label);
+
+		$label = Widget::Label(__('Authors'));
+		$authors = Symphony::Database()->fetch("
+			SELECT * FROM `tbl_authors`;
+		");
+		$options = array();
+		$selected = explode(',', $this->_account['authors']);
+		foreach($authors as $author)
+		{
+			$options[] = array($author['id'], (in_array($author['id'], $selected)), $author['first_name'] . " " . $author['last_name']);
+		}
+		$label->appendChild(Widget::Select('fields[authors][]', $options, array('multiple' => 'multiple')));
+		$div->appendChild($label);
+
+		$fieldset->appendChild($div);
 
 		$this->Form->appendChild($fieldset);
 
@@ -212,24 +247,6 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 
 		$this->Form->appendChild($fieldset);
 
-		$fieldset = new XMLElement('fieldset');
-		$fieldset->setAttribute('class', 'settings');
-		$fieldset->appendChild(new XMLElement('legend', __('Step 4: Choose the Author account')));
-
-		$label = Widget::Label(__('Author'));
-		$authors = Symphony::Database()->fetch("
-			SELECT * FROM `tbl_authors`;
-		");
-		$options = array();
-		foreach($authors as $author)
-		{
-			$options[] = array($author['id'], ($this->_account['author'] == $author['id']), $author['first_name'] . " " . $author['last_name']);
-		}
-		$label->appendChild(Widget::Select('fields[author]', $options));
-		$fieldset->appendChild($label);
-
-		$this->Form->appendChild($fieldset);
-
 		$div = new XMLElement('div');
 		$div->setAttribute('class', 'actions');
 		$div->appendChild(Widget::Input('action[save]', ($this->_mode == 'edit' ? __('Save Changes') : __('Create Account')), 'submit', array('accesskey' => 's')));
@@ -243,27 +260,23 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$this->Form->appendChild($div);
 	}
 
-	public function __viewIndex()
+	public function __prepareIndex()
 	{
 		// List the table columns
 		$this->_table_columns = array(
-			'account'	=> array(__('Account'), true),
-			'author'	=> array(__('Author'), true),
-			'sections'	=> array(__('Sections'), true),
+			'screen_name'	=> array(__('Account'), true),
+			'authors'	=> array(__('Authors'), true),
+			'section'	=> array(__('Section'), true),
 			'last-sent'	=> array(__('Last Sent'), true),
 			'status'	=> array(__('Status'), true)
 		);
-
-		// Begin pagination
-		if(isset($_GET['sort']) && $_GET['sort'] && $this->_table_columns[$_GET['sort']][1])
-		{
-			$this->_table_columns = $_GET['sort'];
+		if (isset($_GET['sort']) && $_GET['sort'] && $this->_table_columns[$_GET['sort']][1]) {
+			$this->_table_column = $_GET['sort'];
 		}
 
 		if (isset($_GET['order']) && $_GET['order'] == 'desc') {
 			$this->_table_direction = 'desc';
 		}
-
 		$this->_pagination = (object)array(
 			'page'		=> (
 				isset($_GET['pg']) && $_GET['pg'] > 1
@@ -278,24 +291,28 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 				id,
 				screen_name,
 				section,
-				author,
+				authors,
 				status
 			FROM tbl_authors_twitter_accounts
+			ORDER BY " . $this->_table_column . " " . strtoupper($this->_table_direction) . "
+			LIMIT " . (($this->_pagination->page - 1) * $this->_pagination->length) . ", " . $this->_pagination->length . "
 		");
 
 		// Calculate pagination:
-		$this->_pagination->start = max(1, (($page - 1) * 17));
+		$this->_pagination->start = max(1, (($this->_pagination->page - 1) * $this->_pagination->length));
 		$this->_pagination->end = (
 			$this->_pagination->start == 1
 			? $this->_pagination->length
-			: $start + count($this->_importers)
+			: $start + count($this->_accounts)
 		);
 		$this->_pagination->total = count($this->_accounts);
 		$this->_pagination->pages = ceil(
 			$this->_pagination->total / $this->_pagination->length
 		);
+	}
 
-
+	public function __viewIndex()
+	{
 		$this->setPageType('table');
 		$this->setTitle(__('Symphony') . ' &ndash; ' . __('Twitter Accounts'));
 
@@ -355,14 +372,14 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 			}
 		}
 
-		$SectionManager = new SectionManager($this->_Parent);
+		$SectionManager = new SectionManager(Symphony::Engine());
 
 		foreach($SectionManager->fetch(NULL, 'ASC', 'sortorder') as $section)
 		{
 			$sections[$section->get('id')] = $section->get('name');
 		}
 
-		$AuthorManager = new AuthorManager($this->_Parent);
+		$AuthorManager = new AuthorManager(Symphony::Engine());
 
 		foreach($AuthorManager->fetch() as $author)
 		{
@@ -394,7 +411,13 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 				));
 
 				// Column 2
-				$col_author = Widget::TableData($authors[$account['author']]);
+				$authors_arr = explode(',', $account['authors']);
+				$author_str = '';
+				foreach($authors_arr as $item)
+				{
+					$author_str .= $authors[$item] . ', ';
+				}
+				$col_author = Widget::TableData(trim($author_str, ', '));
 
 				// Column 3
 				$col_date = Widget::TableData(DateTimeObj::get(
@@ -559,17 +582,18 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 	{
 		if(array_key_exists('save', $_POST['action'])){
 
-			$author = Symphony::Engine()->Author->get('id');
+			$authors = implode(',',$_POST['fields']['authors']);
 
 			Symphony::Database()->query("
 				UPDATE
 					`" . $this->_driver->table . "`
 				SET
 					`section` = {$_POST['fields']['section']},
-					`field` = {$_POST['fields']['field']},
+					`field_param` = {$_POST['fields']['field_param']},
+					`field_msg` = {$_POST['fields']['field_msg']},
 					`page` = {$_POST['fields']['page']},
 					`params` = '{$_POST['fields']['params']}',
-					`author` = {$author},
+					`authors` = {$authors},
 					`status` = 'Active'
 				WHERE
 					`id` = {$this->_account['id']}
@@ -589,17 +613,18 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 	{
 		if(array_key_exists('save', $_POST['action'])){
 
-			$author = Symphony::Engine()->Author->get('id');
+			$authors = implode(',',$_POST['fields']['authors']);
 
 			Symphony::Database()->query("
 				UPDATE
 					`" . $this->_driver->table . "`
 				SET
 					`section` = {$_POST['fields']['section']},
-					`field` = {$_POST['fields']['field']},
+					`field_param` = {$_POST['fields']['field_param']},
+					`field_msg` = {$_POST['fields']['field_msg']},
 					`page` = {$_POST['fields']['page']},
 					`params` = '{$_POST['fields']['params']}',
-					`author` = {$author},
+					`authors` = {$authors},
 					`status` = 'Active'
 				WHERE
 					`id` = {$this->_account['id']}
