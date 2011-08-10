@@ -46,10 +46,11 @@ class Extension_TwitterNotifier extends Extension
 				`oauth_token_secret` text,
 				`authorised` enum('yes','no') DEFAULT 'no',
 				`section` int(10) unsigned NOT NULL,
-				`field` int(10) unsigned NOT NULL,
+				`field_param` int(10) unsigned NOT NULL,
+				`field_msg` int(10) unsigned NOT NULL,
 				`page` int(10) NOT NULL,
 				`params` varchar(250) NOT NULL,
-				`author` int(10) unsigned NOT NULL,
+				`authors` int(10) unsigned NOT NULL,
 				`status` varchar(250) NOT NULL,
 				PRIMARY KEY (`id`)
 			) ENGINE=MyISAM;
