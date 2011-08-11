@@ -49,6 +49,7 @@ If you want more than one section to notify the same Twitter account, or more th
 ##Planned Features
 
 1.	Logging of Twitter Notifications. All notifications logged. Integrate with Tracker, will ask Craig for help on this one [Need Help]
+
 2.	Event. To post on user comments or other frontend submission. Should this just be a filter? [Hard]
 
 3.	Create Datasource. An action in the accounts index, and a button on the edit/saved page to create a datasource for the account, of the status feed. Will utilise the dynamic datasource functions of Symphony. [Hard]
