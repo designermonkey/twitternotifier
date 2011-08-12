@@ -164,7 +164,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$div->appendChild($label);
 
 	// Value Field
-		$label = Widget::Label(__('Field for parameter value)'));
+		$label = Widget::Label(__('Field for parameter value'));
 		$FieldManager = new FieldManager(Symphony::Engine());
 		$options = array();
 		foreach($FieldManager->fetch(NULL, NULL, 'ASC', 'sortorder') as $field)

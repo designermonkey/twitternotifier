@@ -15,8 +15,8 @@ class Extension_TwitterNotifier extends Extension
 		return array
 		(
 			'name'         => 'Twitter Notifier',
-			'version'      => '0.1alpha',
-			'release-date' => '2011-06-05',
+			'version'      => '1.0',
+			'release-date' => '2011-08-12',
 			'author'       => array(
 				'name'    => 'John Porter',
 				'website' => 'http://designermonkey.co.uk/',
@@ -93,7 +93,7 @@ class Extension_TwitterNotifier extends Extension
 		return array(
 			array(
 				'location' => 'System',
-				'name' => 'Twitter Accounts',
+				'name' => __('Twitter Accounts'),
 				'link' => '/accounts/'
 				)
 		);
@@ -137,20 +137,20 @@ class Extension_TwitterNotifier extends Extension
 	{
 		$fieldset = new XMLElement('fieldset');
 		$fieldset->setAttribute('class', 'settings');
-		$fieldset->appendChild(new XMLElement('legend', 'Twitter Notifier'));
+		$fieldset->appendChild(new XMLElement('legend', __('Twitter API')));
 
 		$status = new XMLElement('div');
 
 		if($this->_checkConsumerDetails() == true)
 		{
-			$status->appendChild(new XMLElement('p', 'Your Consumer details are saved in the preferences, to change them, please re-enter them here.'));
+			$status->appendChild(new XMLElement('p', __('Your Consumer details are saved in the preferences, to change them, please re-enter them here.')));
 		}
 		else
 		{
 			// Add info
-			$fieldset->appendChild(new XMLElement('p','An <a href="http://dev.twitter.com/login" title="Login at Twitter Developers site">application will need registering</a> with a Twitter account to get the details required here.'));
+			$fieldset->appendChild(new XMLElement('p',__('An <a href="http://dev.twitter.com/login" title="Login at Twitter Developers site">application will need registering</a> with a Twitter account to get the details required here.')));
 			$status->setAttribute('class', 'invalid');
-			$p = new XMLElement('p', 'Your Consumer details are not saved in the preferences enter them to save.');
+			$p = new XMLElement('p', __('Your Consumer details are not saved in the preferences enter them to save.'));
 			$p->setAttribute('style', 'padding-top:0.75em');
 			$status->appendChild($p);
 		}
@@ -160,30 +160,76 @@ class Extension_TwitterNotifier extends Extension
 		$div->setAttribute('class','group');
 
 		// Add Consumer Key field
-		$label = Widget::Label('Consumer Key');
+		$label = Widget::Label(__('Consumer Key'));
 		$label->appendChild(Widget::Input('settings[twitter-notifier][consumer-key]', null, 'password'));
 		$div->appendChild($label);
 		// Add Consumer Secret field
-		$label = Widget::Label('Consumer Secret');
+		$label = Widget::Label(__('Consumer Secret'));
 		$label->appendChild(Widget::Input('settings[twitter-notifier][consumer-secret]', null, 'password'));
 		$div->appendChild($label);
 		$fieldset->appendChild($div);
 		// Add sub help
-		$fieldset->appendChild(new XMLElement('p','Your Consumer details are required to allow Author accounts access to notify Twitter.', array('class' => 'help')));
-
-		// Need to build the checkbox for removing settings.
+		$fieldset->appendChild(new XMLElement('p',__('Your Consumer details are required to allow Author accounts access to notify Twitter.'), array('class' => 'help')));
 
 		$context['wrapper']->appendChild($fieldset);
 	}
 
+	/**
+	 * Sends the notification to Twitter
+	 */
+	public function sendTwitterNotification($context)
+	{
 
+	// Get any accounts that relate to this section
+		$accounts = Symphony::Database()->fetch("
+			SELECT * FROM `" . $this->table . "` WHERE `section` = " . (int)$context['section']->get('id') . ";
+		");
 
+		$author_id = $context['entry']->get('author_id');
 
+		foreach($accounts as $account)
+		{
+			$account['authors'] = explode(',',$account['authors']);
 
+			if(!in_array($author_id, $account['authors'])) continue;
 
+			$page = Symphony::Database()->fetch("
+				SELECT * FROM `tbl_pages` WHERE `id` = " . $account['page'] . ";
+			");
+			$page = current($page);
 
+			$url = URL . '/' . ($page['path'] ? $page['path'] . '/' : '') . $page['handle'] . '/' . $account['params'] . '/';
+			$url_handle = $context['entry']->getData($account['field_param']);
+			$url = str_replace('$field', $url_handle['handle'], $url);
 
-// -----------------------------------------------------------------------------
+			$msg = $context['entry']->getData($account['field_msg']);
+
+			$TwitterOAuth = new TwitterOAuth(
+				$this->getConsumerKey(),
+				$this->getConsumerSecret(),
+				$account['oauth_token'],
+				$account['oauth_token_secret']
+			);
+
+			$reserve = $TwitterOAuth->get('help/configuration')->short_url_length;
+
+			$msg_append = '... ' . __('Read more') . ' ';
+
+			$reserve += count($msg_append);
+
+			$msg = preg_replace('/\s+?(\S+)?$/', '', substr($msg['value'], 0, (141 - $reserve)));
+
+			$tweet = $msg . $msg_append . $url;
+
+			$result = $TwitterOAuth->post('statuses/update', array(
+				'status' => $tweet,
+				'wrap_links' => 'true',
+				'trim_user' => 'true',
+				'include_entities' => 'true'
+			));
+			// I've requested entities to be returned for future implemntation of Tracker support
+		}
+	}
 
 	/**
 	 * Helper Function - Get the consumer key from the Configuration object

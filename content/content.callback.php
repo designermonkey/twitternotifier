@@ -43,7 +43,7 @@ class contentExtensionTwitterNotifierCallback extends AdministrationPage
 
 		$access_token = $this->TwitterOAuth->getAccessToken($_GET['oauth_verifier']);
 
-		$this->setTitle(__('%1$s &ndash; %2$s', array(__('Twitter Accounts'), __('Symphony'))));
+		$this->setTitle('%1$s &ndash; %2$s', array(__('Twitter Accounts'), __('Symphony')));
 		$this->appendSubheading(__('Twitter Authorization'));
 
 		$fieldset = new XMLElement('fieldset');
