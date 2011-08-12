@@ -20,7 +20,7 @@ Simply put, don't. It's not finished yet, but if you must:
 
 ##Usage
 
-A new menu option is available under Preferences called 'Twitter Accounts' where authors can register Twitter accounts to monitor sections of Symphony and post when new entries are made by specified Authors. The account creation process is as follows:
+A new menu option is available under 'System' called 'Twitter Accounts' where authors can register Twitter accounts to monitor sections of Symphony and post when new entries are made by specified Authors. The account creation process is as follows:
 
 1.	Click on 'Create New' to open the new entry page.
 
