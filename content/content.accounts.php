@@ -582,7 +582,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 	{
 		if(array_key_exists('save', $_POST['action'])){
 
-			$authors = implode(',',$_POST['fields']['authors']);
+			$authors = trim(implode(',',$_POST['fields']['authors']),',');
 
 			Symphony::Database()->query("
 				UPDATE
@@ -593,7 +593,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 					`field_msg` = {$_POST['fields']['field_msg']},
 					`page` = {$_POST['fields']['page']},
 					`params` = '{$_POST['fields']['params']}',
-					`authors` = {$authors},
+					`authors` = '{$authors}',
 					`status` = 'Active'
 				WHERE
 					`id` = {$this->_account['id']}
@@ -613,7 +613,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 	{
 		if(array_key_exists('save', $_POST['action'])){
 
-			$authors = implode(',',$_POST['fields']['authors']);
+			$authors = trim(implode(',',$_POST['fields']['authors']),',');
 
 			Symphony::Database()->query("
 				UPDATE
@@ -624,7 +624,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 					`field_msg` = {$_POST['fields']['field_msg']},
 					`page` = {$_POST['fields']['page']},
 					`params` = '{$_POST['fields']['params']}',
-					`authors` = {$authors},
+					`authors` = '{$authors}',
 					`status` = 'Active'
 				WHERE
 					`id` = {$this->_account['id']}
