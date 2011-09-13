@@ -237,7 +237,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 
 	// Parameters
 		$label = Widget::Label(__('Parameters'));
-		$value = '$field';
+		$value = ($this->_mode === 'edit') ? '' : '$field';
 		if($this->_account['params'])
 		{
 			$value = $this->_account['params'];
