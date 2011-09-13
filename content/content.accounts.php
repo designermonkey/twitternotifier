@@ -191,6 +191,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$label->appendChild(Widget::Select('fields[field_msg]', $options, array('id' => 'field_msg')));
 		$div->appendChild($label);
 
+	// Authors
 		$label = Widget::Label(__('Authors'));
 		$authors = Symphony::Database()->fetch("
 			SELECT * FROM `tbl_authors`;
@@ -217,6 +218,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$div = new XMLElement('div');
 		$div->setAttribute('class', 'group');
 
+	// Page
 		$label = Widget::Label(__('Page'));
 		$pages = Symphony::Database()->fetch("SELECT * FROM `tbl_pages`");
 		$options = array();
@@ -233,6 +235,7 @@ class contentExtensionTwitterNotifierAccounts extends AdministrationPage
 		$label->appendChild(Widget::Select('fields[page]', $options, array('id' => 'pages')));
 		$div->appendChild($label);
 
+	// Parameters
 		$label = Widget::Label(__('Parameters'));
 		$value = '$field';
 		if($this->_account['params'])

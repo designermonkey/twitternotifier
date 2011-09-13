@@ -15,7 +15,7 @@ class Extension_TwitterNotifier extends Extension
 		return array
 		(
 			'name'         => 'Twitter Notifier',
-			'version'      => '1.0',
+			'version'      => '1.0.2',
 			'release-date' => '2011-08-12',
 			'author'       => array(
 				'name'    => 'John Porter',
@@ -50,7 +50,7 @@ class Extension_TwitterNotifier extends Extension
 				`field_msg` int(10) unsigned NOT NULL,
 				`page` int(10) NOT NULL,
 				`params` varchar(250) NOT NULL,
-				`authors` int(10) unsigned NOT NULL,
+				`authors` varchar(250) NOT NULL,
 				`status` varchar(250) NOT NULL,
 				PRIMARY KEY (`id`)
 			) ENGINE=MyISAM;
