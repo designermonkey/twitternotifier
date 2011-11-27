@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension id="twitternotifier">
+	<name>Twitter Notifier</name>
+	<description>Notify Twitter when entries are posted.</description>
+	<repo type="github">https://github.com/designermonkey/twitternotifier</repo>
+	<url type="discuss">http://symphony-cms.com/discuss/thread/75371/</url>
+	<types>
+		<type>Third Party Integration</type>
+		<type>Workflow</type>
+	</types>
+	<authors>
+		<author>
+			<name github="designermonkey" symphony="designermonkey">John Porter</name>
+			<website>http://designermonkey.co.uk</website>
+		</author>
+	</authors>
+	<releases>
+		<release version="1.0.2" date="2011-08-12" min="2.2.2" />
+	</releases>
+</extension>
